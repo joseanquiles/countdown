@@ -1,3 +1,8 @@
+/*
+  proyecto: countdown
+  autor: cecilia
+  fecha: 20/08/2026 21:32:21
+*/
 /* ══════════════════════════════════════════════════════════════════
    Cuenta Atrás — temporizadores persistentes en localStorage
    ══════════════════════════════════════════════════════════════════ */
