@@ -4,12 +4,20 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cuenta Atrás</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⏳</text></svg>">
 </head>
 <body>
-  <header class="topbar">
-    <h1 class="brand"><span class="brand-icon">⏳</span> Cuenta Atrás</h1>
+  <header class="site-nav">
+    <div class="site-nav__logo">
+      <svg class="site-nav__logo-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M6 2h12M6 22h12M6 2c0 5 6 6 6 10s-6 5-6 10M18 2c0 5-6 6-6 10s6 5 6 10"/>
+      </svg>
+      <span class="site-nav__logo-text">Cuenta Atrás</span>
+    </div>
     <button id="btn-new" class="btn btn-primary">+ Nuevo temporizador</button>
   </header>
 
@@ -17,6 +25,7 @@
     <!-- ── Panel del temporizador activo ───────────────────────────── -->
     <section class="panel stage" aria-label="Temporizador en marcha">
       <div class="stage-head">
+        <p class="eyebrow">En el reloj</p>
         <h2 id="active-name" class="stage-name">Sin temporizador</h2>
         <p id="active-desc" class="stage-desc">Selecciona o crea un temporizador para empezar.</p>
       </div>
@@ -33,10 +42,10 @@
       </div>
 
       <div class="controls">
-        <button id="btn-start"    class="btn btn-start"    disabled>▶ Start</button>
-        <button id="btn-pause"    class="btn btn-pause"    disabled>⏸ Pause</button>
-        <button id="btn-continue" class="btn btn-continue" disabled>⏵ Continue</button>
-        <button id="btn-stop"     class="btn btn-stop"     disabled>⏹ Stop</button>
+        <button id="btn-start"    class="btn btn-start"    disabled>Start</button>
+        <button id="btn-pause"    class="btn btn-pause"    disabled>Pause</button>
+        <button id="btn-continue" class="btn btn-continue" disabled>Continue</button>
+        <button id="btn-stop"     class="btn btn-stop"     disabled>Stop</button>
       </div>
     </section>
 

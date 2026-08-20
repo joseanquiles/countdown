@@ -47,7 +47,7 @@
       localStorage.setItem(STORAGE_KEY, JSON.stringify(timers));
     } catch (err) {
       console.warn('No se pudo escribir en localStorage:', err);
-      toast('⚠️ No se han podido guardar los cambios');
+      toast('No se han podido guardar los cambios');
     }
   }
 
@@ -104,9 +104,9 @@
       const actions = document.createElement('div');
       actions.className = 'timer-actions';
       actions.append(
-        action('▶ Lanzar', 'btn-start',  () => launch(t.id)),
-        action('✎ Editar', 'btn-ghost',  () => openModal(t.id)),
-        action('🗑 Borrar', 'btn-stop',   () => remove(t.id)),
+        action('Lanzar', 'btn-start',  () => launch(t.id)),
+        action('Editar', 'btn-ghost',  () => openModal(t.id)),
+        action('Borrar', 'btn-stop',   () => remove(t.id)),
       );
       li.append(actions);
 
@@ -152,9 +152,9 @@
     el.cont.disabled  = phase !== 'paused';
     el.stop.disabled  = phase === 'idle';
 
-    document.title = phase === 'running' || phase === 'paused'
-      ? `${format(remainingMs)} · ${t.name}`
-      : 'Cuenta Atrás';
+    if (phase === 'running' || phase === 'paused') document.title = `${format(remainingMs)} · ${t.name}`;
+    else if (phase === 'finished') document.title = `¡TIEMPO! · ${t.name}`;
+    else document.title = 'Cuenta Atrás';
   }
 
   function select(id) {
@@ -173,10 +173,11 @@
     const t = timers.find((x) => x.id === activeId);
     if (!t) return;
     totalMs = durationOf(t);
-    if (totalMs <= 0) return toast('⚠️ La duración debe ser mayor que 00:00:00');
+    if (totalMs <= 0) return toast('La duración debe ser mayor que 00:00:00');
     remainingMs = totalMs;
     deadline = Date.now() + remainingMs;
     phase = 'running';
+    askNotificationPermission(true);
     startTicker();
     render();
   }
@@ -226,7 +227,7 @@
       stopTicker();
       alarm();
       const t = timers.find((x) => x.id === activeId);
-      toast(`⏰ ¡Tiempo! — ${t ? t.name : ''}`, 6000);
+      toast(`¡Tiempo! — ${t ? t.name : ''}`, 6000);
       notify(t);
     }
     render();
@@ -259,7 +260,46 @@
 
   function notify(t) {
     if (!('Notification' in window) || Notification.permission !== 'granted') return;
-    new Notification('⏰ ¡Tiempo!', { body: t ? `${t.name}${t.description ? ' — ' + t.description : ''}` : '' });
+    try {
+      new Notification('¡Tiempo!', {
+        body: t ? `${t.name}${t.description ? ' — ' + t.description : ''}` : '',
+        tag: 'cuenta-atras',        // evita apilar avisos repetidos
+        requireInteraction: true,   // permanece hasta que se cierra
+      });
+    } catch (err) {
+      console.warn('No se pudo mostrar la notificación:', err);
+    }
+  }
+
+  let notifWarned = false;
+
+  // Aviso único: sin permiso concedido no habrá alerta con la pestaña en segundo plano.
+  function warnIfNoNotifications() {
+    if (notifWarned || !('Notification' in window) || Notification.permission === 'granted') return;
+    notifWarned = true;
+    toast(Notification.permission === 'denied'
+      ? 'Notificaciones bloqueadas: no habrá aviso si cambias de pestaña'
+      : 'Permite las notificaciones para recibir el aviso en segundo plano', 5000);
+  }
+
+  // El navegador solo acepta la petición dentro de un gesto del usuario, así que
+  // se intenta en la primera interacción con la página y al arrancar un temporizador.
+  function askNotificationPermission(warnAfter = false) {
+    if (!('Notification' in window)) return;
+    if (Notification.permission !== 'default') {
+      if (warnAfter) warnIfNoNotifications();
+      return;
+    }
+    try {
+      const result = Notification.requestPermission();
+      if (result && typeof result.then === 'function') {
+        result.then(() => { if (warnAfter) warnIfNoNotifications(); }).catch(() => {});
+      } else if (warnAfter) {
+        warnIfNoNotifications();
+      }
+    } catch (err) {
+      console.warn('Permiso de notificaciones no disponible:', err);
+    }
   }
 
   /* ── Alta / edición ─────────────────────────────────────────────── */
@@ -307,12 +347,12 @@
       Object.assign(t, data);
       // Si se edita el que está en el escenario, se recarga con la nueva duración.
       if (id === activeId) select(id);
-      toast('✔ Temporizador actualizado');
+      toast('Temporizador actualizado');
     } else {
       const created = { id: newId(), ...data, createdAt: new Date().toISOString() };
       timers.push(created);
       if (!activeId) select(created.id);
-      toast('✔ Temporizador creado');
+      toast('Temporizador creado');
     }
 
     save();
@@ -342,7 +382,7 @@
     }
     renderList();
     render();
-    toast('🗑 Temporizador borrado');
+    toast('Temporizador borrado');
   }
 
   /* ── Toast ──────────────────────────────────────────────────────── */
@@ -379,9 +419,7 @@
   });
 
   /* ── Arranque ───────────────────────────────────────────────────── */
-  if ('Notification' in window && Notification.permission === 'default') {
-    el.newBtn.addEventListener('click', () => Notification.requestPermission(), { once: true });
-  }
+  document.addEventListener('pointerdown', () => askNotificationPermission(), { once: true });
 
   if (timers.length === 0) {
     timers = [
