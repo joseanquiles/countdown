@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cuenta Atrás</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⏳</text></svg>">
+</head>
+<body>
+  <header class="topbar">
+    <h1 class="brand"><span class="brand-icon">⏳</span> Cuenta Atrás</h1>
+    <button id="btn-new" class="btn btn-primary">+ Nuevo temporizador</button>
+  </header>
+
+  <main class="layout">
+    <!-- ── Panel del temporizador activo ───────────────────────────── -->
+    <section class="panel stage" aria-label="Temporizador en marcha">
+      <div class="stage-head">
+        <h2 id="active-name" class="stage-name">Sin temporizador</h2>
+        <p id="active-desc" class="stage-desc">Selecciona o crea un temporizador para empezar.</p>
+      </div>
+
+      <div class="dial">
+        <svg class="ring" viewBox="0 0 240 240" aria-hidden="true">
+          <circle class="ring-track" cx="120" cy="120" r="110"></circle>
+          <circle id="ring-progress" class="ring-progress" cx="120" cy="120" r="110"></circle>
+        </svg>
+        <div class="dial-inner">
+          <div id="display" class="display">00:00:00</div>
+          <div id="state-badge" class="badge badge-idle">Detenido</div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button id="btn-start"    class="btn btn-start"    disabled>▶ Start</button>
+        <button id="btn-pause"    class="btn btn-pause"    disabled>⏸ Pause</button>
+        <button id="btn-continue" class="btn btn-continue" disabled>⏵ Continue</button>
+        <button id="btn-stop"     class="btn btn-stop"     disabled>⏹ Stop</button>
+      </div>
+    </section>
+
+    <!-- ── Lista de temporizadores guardados ───────────────────────── -->
+    <section class="panel list-panel" aria-label="Temporizadores guardados">
+      <div class="list-head">
+        <h2>Mis temporizadores</h2>
+        <span id="count" class="pill">0</span>
+      </div>
+      <ul id="timer-list" class="timer-list"></ul>
+      <p id="empty-state" class="empty">
+        Todavía no hay temporizadores.<br>
+        Pulsa <strong>+ Nuevo temporizador</strong> para crear el primero.
+      </p>
+    </section>
+  </main>
+
+  <!-- ── Modal de alta / edición ───────────────────────────────────── -->
+  <div id="modal" class="modal" hidden>
+    <div class="modal-backdrop" data-close></div>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <h2 id="modal-title">Nuevo temporizador</h2>
+      <form id="timer-form" novalidate>
+        <input type="hidden" id="f-id">
+
+        <label class="field">
+          <span>Nombre</span>
+          <input type="text" id="f-name" maxlength="60" placeholder="Ej. Café" required>
+        </label>
+
+        <label class="field">
+          <span>Descripción</span>
+          <textarea id="f-desc" rows="3" maxlength="240" placeholder="Texto descriptivo del temporizador"></textarea>
+        </label>
+
+        <fieldset class="time-fields">
+          <legend>Duración</legend>
+          <label><span>Horas</span>   <input type="number" id="f-h" min="0" max="99" value="0"></label>
+          <label><span>Minutos</span> <input type="number" id="f-m" min="0" max="59" value="5"></label>
+          <label><span>Segundos</span><input type="number" id="f-s" min="0" max="59" value="0"></label>
+        </fieldset>
+
+        <p id="form-error" class="form-error" hidden></p>
+
+        <div class="modal-actions">
+          <button type="button" class="btn btn-ghost" data-close>Cancelar</button>
+          <button type="submit" class="btn btn-primary">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" hidden></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
